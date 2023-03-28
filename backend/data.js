@@ -66,7 +66,7 @@ const data = {
       category: 'Shirts',
       image: '/images/holister_blue.jpeg',
       price: 25,
-      countInStock: 2,
+      countInStock: 0,
       brand: 'Holister',
       rating: 5,
       numReviews: 1,

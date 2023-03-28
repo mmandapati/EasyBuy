@@ -56,6 +56,10 @@ main {
   text-align: center;
   font-weight: bold;
 }
+.product-image {
+  max-width: 100%;
+  max-height: 100%;
+}
 
 /* .rating span {
   color: #ffc000;
