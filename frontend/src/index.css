@@ -7,12 +7,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.site-container {
+  min-height: 100vh;
+}
+
 header {
-  padding: 1rem;
+  /* padding: 1rem; */
   border-bottom: medium solid #4447e0;
 }
 
-header a {
+.nav-style {
+  magin-left: 100px;
+}
+
+.link-decor {
   color: #4447e0;
   font-size: 25px;
   font-weight: bold;
@@ -21,8 +29,13 @@ header a {
 
 main {
   margin: 1rem;
+  flex: 1;
 }
 
+.header-bottom {
+  padding: 1rem;
+  border-bottom: medium solid #4447e0;
+}
 .products {
   display: flex;
   flex-wrap: wrap;
@@ -43,3 +56,7 @@ main {
   text-align: center;
   font-weight: bold;
 }
+
+/* .rating span {
+  color: #ffc000;
+} */
