@@ -1,6 +1,7 @@
 const data = {
   products: [
     {
+      _id: '1',
       name: 'Womens Polo Shirt',
       slug: 'aero-polo-shirt',
       category: 'Shirts',
@@ -13,6 +14,7 @@ const data = {
       description: 'Aeropostale Womens Polo Shirt',
     },
     {
+      _id: '2',
       name: 'Womens Graphic T Shirt',
       slug: 'aero-tee',
       category: 'Shirts',
@@ -25,6 +27,7 @@ const data = {
       description: 'Aeropostale Womens Graphic Tee',
     },
     {
+      _id: '3',
       name: 'Womens Crop Top',
       slug: 'tommy-crop',
       category: 'Shirts',
@@ -37,6 +40,7 @@ const data = {
       description: 'Tommy Hilfiger Womens Crop Top',
     },
     {
+      _id: '4',
       name: 'Womens White Shirt',
       slug: 'tommy-white',
       category: 'Shirts',
@@ -49,6 +53,7 @@ const data = {
       description: 'Tommy Hilfiger Womens White Shirt',
     },
     {
+      _id: '5',
       name: 'Womens T Shirt',
       slug: 'holister-tshirt',
       category: 'Shirts',
@@ -61,6 +66,7 @@ const data = {
       description: 'Holister Womens T Shirt',
     },
     {
+      _id: '6',
       name: 'Womens Blue Shirt',
       slug: 'holister-blue',
       category: 'Shirts',
@@ -73,6 +79,7 @@ const data = {
       description: 'Holister Womens Blue Shirt',
     },
     {
+      _id: '7',
       name: 'Womens Tee Shirt',
       slug: 'gap-shirt',
       category: 'Shirts',
