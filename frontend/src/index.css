@@ -61,6 +61,9 @@ main {
   max-height: 100%;
 }
 
+.img-thumbnail {
+  height: 100px;
+}
 /* .rating span {
   color: #ffc000;
 } */
