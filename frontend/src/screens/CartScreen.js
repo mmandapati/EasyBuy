@@ -59,6 +59,9 @@ export default function CartScreen() {
                         src={item.image}
                         alt={item.name}
                         className="img-fluid rounded img-thumbnail"
+                        style={{
+                          height: '100px',
+                        }}
                       ></img>{' '}
                       <Link to={`/product/${item.slug}`}>{item.name}</Link>
                     </Col>
