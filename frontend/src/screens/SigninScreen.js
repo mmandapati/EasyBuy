@@ -15,6 +15,7 @@ export default function SigninScreen() {
   const navigate = useNavigate();
   const redirectInURL = new URLSearchParams(search).get('redirect');
   const redirect = redirectInURL ? redirectInURL : '/';
+  console.log('redirect: ', redirect);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -29,6 +30,7 @@ export default function SigninScreen() {
       });
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
+      console.log('submit handler', redirect);
       navigate(redirect || '/');
     } catch (err) {
       toast.error(getError(err));
@@ -37,6 +39,7 @@ export default function SigninScreen() {
 
   useEffect(() => {
     if (userInfo) {
+      console.log('Entered useEffect');
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
