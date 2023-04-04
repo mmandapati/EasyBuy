@@ -38,6 +38,7 @@ export default function SignupScreen() {
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       console.log('submit handler', redirect);
+      console.log('local storage after Signuo', userInfo);
       navigate(redirect || '/');
     } catch (err) {
       toast.error(getError(err));
