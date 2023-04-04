@@ -47,7 +47,7 @@ export default function PaymentScreen() {
         cvv,
       })
     );
-    navigate('/placeOrder');
+    navigate('/placeorder');
   };
   return (
     <div>
