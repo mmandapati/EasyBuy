@@ -1,88 +1,75 @@
+import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import { Helmet } from 'react-helmet-async';
-import CheckoutSteps from '../components/CheckoutSteps';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import LoadingBox from '../components/LoadingBox';
+import MessageBox from '../components/MessageBox';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
-import { Link, useNavigate } from 'react-router-dom';
 import { Store } from '../Store';
-import { toast } from 'react-toastify';
 import { getError } from '../utils';
-import axios from 'axios';
-import LoadingBox from '../components/LoadingBox';
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'CREATE_REQUEST':
+    case 'FETCH_REQUEST':
       return { ...state, loading: true };
-    case 'CREATE_SUCCESS':
-      return { ...state, loading: false };
-    case 'CREATE_FAIL':
-      return { ...state, loading: false };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, order: action.payload };
+    case 'FETCH_FAIL':
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export default function PlaceOrderScreen() {
+export default function OrderScreen() {
   const navigate = useNavigate();
-  const [{ loading }, dispatch] = useReducer(reducer, {
-    loading: false,
+  const { state } = useContext(Store);
+  const { userInfo } = state;
+
+  const params = useParams();
+  const { id: orderId } = params;
+
+  const [{ loading, order, error }, dispatch] = useReducer(reducer, {
+    loading: true,
+    order: {},
+    error: '',
   });
 
-  const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart, userInfo } = state;
-  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
-  cart.itemsPrice = round2(
-    cart.cartItems.reduce((a, c) => a + c.price * c.quantity, 0)
-  );
-  cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
-  cart.taxPrice = round2(0.15 * cart.itemsPrice);
-  cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
-  const placeOrderHandler = async () => {
-    try {
-      dispatch({ type: 'CREATE_REQUEST' });
-      const { data } = await axios.post(
-        '/api/orders',
-        {
-          orderItems: cart.cartItems,
-          shippingAddress: cart.shippingAddress,
-          paymentInfo: cart.paymentInfo,
-          itemsPrice: cart.itemsPrice,
-          shippingPrice: cart.shippingPrice,
-          taxPrice: cart.taxPrice,
-          totalPrice: cart.totalPrice,
-        },
-        {
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        dispatch({ type: 'FETCH_REQUEST' });
+        const { data } = await axios.get(`/api/orders/${orderId}`, {
           headers: {
             authorization: `Bearer ${userInfo.token}`,
           },
-        }
-      );
-      ctxDispatch({ type: 'CLEAR_CART' });
-      dispatch({ type: 'CREATE_SUCCESS' });
-      localStorage.removeItem('cartItems');
-      navigate(`/order/${data.order._id}`);
-    } catch (err) {
-      dispatch({ type: 'CREATE_FAIL' });
-      toast.error(getError(err));
+        });
+        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+      } catch (err) {
+        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+      }
+    };
+    if (!userInfo) {
+      navigate('/login');
     }
-  };
-  useEffect(() => {
-    if (!cart.paymentInfo.cardNumber) {
-      navigate('/payment');
+    if (!order._id || (order._id && order._id !== orderId)) {
+      fetchOrder();
     }
-  }, [cart, navigate]);
+  }, [order, orderId, userInfo, navigate]);
 
-  return (
+  return loading ? (
+    <LoadingBox></LoadingBox>
+  ) : error ? (
+    <MessageBox variant="danger">{error}</MessageBox>
+  ) : (
     <div>
-      <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
       <Helmet>
-        <title>Order Preview</title>
+        <title>Order {orderId}</title>
       </Helmet>
-      <h1 className="my-3">Order Preview</h1>
+      <h1 className="my-3">Order {orderId}</h1>
       <Row>
         <Col md={8}>
           <Card className="mb-3">
@@ -90,13 +77,20 @@ export default function PlaceOrderScreen() {
               <Card.Title>Shipping Address</Card.Title>
               <Card.Text>
                 <strong>Name: </strong>
-                {cart.shippingAddress.fullName}
+                {order.shippingAddress.fullName}
                 <br />
                 <strong>Address: </strong>
-                {cart.shippingAddress.address},{cart.shippingAddress.city},
-                {cart.shippingAddress.postalCode},{cart.shippingAddress.country}
+                {order.shippingAddress.address},{order.shippingAddress.city},
+                {order.shippingAddress.postalCode},
+                {order.shippingAddress.country}
               </Card.Text>
-              <Link to="/shipping">Edit</Link>
+              {order.isDelivered ? (
+                <MessageBox varaiant="success">
+                  Delivered at {order.deliveredAt}
+                </MessageBox>
+              ) : (
+                <MessageBox variant="danger">Not Delivered</MessageBox>
+              )}
             </Card.Body>
           </Card>
           <Card className="mb-3">
@@ -104,19 +98,19 @@ export default function PlaceOrderScreen() {
               <Card.Title>Payment Information</Card.Title>
               <Card.Text>
                 <strong>Name on Card: </strong>
-                {cart.paymentInfo.cardName}
+                {order.paymentInfo.cardName}
                 <br />
                 <strong>Card Number : </strong>
-                {cart.paymentInfo.cardNumber}
+                {order.paymentInfo.cardNumber}
               </Card.Text>
-              <Link to="/payment">Edit</Link>
+              <MessageBox variant="success">Payment successful</MessageBox>
             </Card.Body>
           </Card>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Items</Card.Title>
               <ListGroup variant="flush">
-                {cart.cartItems.map((item) => (
+                {order.orderItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center">
                       <Col md={8}>
@@ -136,31 +130,30 @@ export default function PlaceOrderScreen() {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
-              <Link to="/cart">Edit</Link>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4}>
-          <Card>
+          <Card className="mb-3">
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col> ${cart.itemsPrice.toFixed(2)}</Col>
+                    <Col> ${order.itemsPrice.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col> ${cart.shippingPrice.toFixed(2)}</Col>
+                    <Col> ${order.shippingPrice.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col> ${cart.taxPrice.toFixed(2)}</Col>
+                    <Col> ${order.taxPrice.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -169,22 +162,9 @@ export default function PlaceOrderScreen() {
                       <strong> Order Total </strong>
                     </Col>
                     <Col>
-                      <strong>${cart.totalPrice.toFixed(2)}</strong>
+                      <strong>${order.totalPrice.toFixed(2)}</strong>
                     </Col>
                   </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className="d-grid">
-                    <Button
-                      type="button"
-                      variant="outline-primary"
-                      onClick={placeOrderHandler}
-                      disabled={cart.cartItems.length === 0}
-                    >
-                      Place Order
-                    </Button>
-                  </div>
-                  {loading && <LoadingBox></LoadingBox>}
                 </ListGroup.Item>
               </ListGroup>
             </Card.Body>
