@@ -90,6 +90,7 @@ export default function PaymentScreen() {
               <Form.Group className="mb-3" controlId="cvv">
                 <Form.Label>Security Code</Form.Label>
                 <Form.Control
+                  type="number"
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value)}
                   required
