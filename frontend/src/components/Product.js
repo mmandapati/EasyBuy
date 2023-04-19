@@ -32,7 +32,7 @@ function Product(props) {
           className="card-img-top"
           alt={product.name}
           style={{
-            width: '300px',
+            width: '290px',
             height: '400px',
             padding: '5px',
           }}

@@ -9,6 +9,7 @@ body {
 
 .site-container {
   min-height: 100vh;
+  transition: 0.4s;
 }
 
 header {
@@ -79,4 +80,23 @@ main {
 .checkout-steps > div.active {
   /* border-bottom: 0.2rem solid #4447e0; */
   color: #4447e0;
+}
+
+/* sidebar */
+.navbar-brand {
+  font-weight: bold;
+}
+.side-navbar {
+  width: 180px;
+  height: 100%;
+  position: absolute;
+  left: -300px;
+  transition: 0.5s;
+}
+
+.active-cont {
+  margin-left: 180px;
+}
+.active-nav {
+  left: 0;
 }
