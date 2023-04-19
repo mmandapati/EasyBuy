@@ -6,7 +6,6 @@ import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import axios from 'axios';
-import Container from 'react-bootstrap/Container';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -61,11 +60,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Container
-      style={{
-        maxWidth: '500px',
-      }}
-    >
+    <div className="container small-container">
       <Helmet>
         <title>User Profile</title>
       </Helmet>
@@ -106,6 +101,6 @@ export default function ProfileScreen() {
           <Button type="submit">Update</Button>
         </div>
       </form>
-    </Container>
+    </div>
   );
 }
