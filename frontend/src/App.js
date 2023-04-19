@@ -6,8 +6,6 @@ import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Badge from 'react-bootstrap/Badge';
 import Container from 'react-bootstrap/Container';
@@ -19,14 +17,10 @@ import SigninScreen from './screens/SigninScreen';
 import ShippingAddressScreen from './screens/ShippingAddressScreen';
 import SignupScreen from './screens/SignupScreen';
 import PaymentScreen from './screens/PaymentScreen';
-import DashboardScreen from './screens/DashboardScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
-import SearchBox from './components/SearchBox.js';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -58,62 +52,38 @@ function App() {
                   EasyBuy
                 </Navbar.Brand>
               </LinkContainer>
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
-              <Navbar.Collapse id="basic-navbar-nav">
-                <SearchBox style={{ justifyContent: 'center' }} />
-                <Nav className="justify-content-end">
-                  <Link to="/cart" className="nav-link">
-                    Cart
-                    {cart.cartItems.length > 0 && (
-                      <Badge pill bg="danger">
-                        {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
-                      </Badge>
-                    )}
-                  </Link>
-                  {userInfo ? (
-                    <NavDropdown title={userInfo.name} id="nav-dropdown">
-                      <LinkContainer to="/profile">
-                        <NavDropdown.Item eventKey="1">
-                          Profile
-                        </NavDropdown.Item>
-                      </LinkContainer>
-                      <LinkContainer to="/orders">
-                        <NavDropdown.Item eventKey="2">Orders</NavDropdown.Item>
-                      </LinkContainer>
-                      <NavDropdown.Divider />
-                      <Link
-                        className="dropdown-item"
-                        to="#signout"
-                        onClick={signoutHandler}
-                      >
-                        <NavDropdown.Item eventKey="3">
-                          Sign Out
-                        </NavDropdown.Item>
-                      </Link>
-                    </NavDropdown>
-                  ) : (
-                    <Link className="nav-link" to="/signin">
-                      Sign in
+              <Nav className="justify-content-end">
+                <Link to="/cart" className="nav-link">
+                  Cart
+                  {cart.cartItems.length > 0 && (
+                    <Badge pill bg="danger">
+                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                    </Badge>
+                  )}
+                </Link>
+                {userInfo ? (
+                  <NavDropdown title={userInfo.name} id="nav-dropdown">
+                    <LinkContainer to="/profile">
+                      <NavDropdown.Item eventKey="1">Profile</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to="/orders">
+                      <NavDropdown.Item eventKey="2">Orders</NavDropdown.Item>
+                    </LinkContainer>
+                    <NavDropdown.Divider />
+                    <Link
+                      className="dropdown-item"
+                      to="#signout"
+                      onClick={signoutHandler}
+                    >
+                      <NavDropdown.Item eventKey="3">Sign Out</NavDropdown.Item>
                     </Link>
-                  )}
-                  {userInfo && userInfo.isAdmin && (
-                    <NavDropdown title="Admin" id="admin-nav-dropdown">
-                      <LinkContainer to="/admin/dashboard">
-                        <NavDropdown.Item>Dashboard</NavDropdown.Item>
-                      </LinkContainer>
-                      <LinkContainer to="/admin/productlist">
-                        <NavDropdown.Item>Products</NavDropdown.Item>
-                      </LinkContainer>
-                      <LinkContainer to="/admin/orderlist">
-                        <NavDropdown.Item>Orders</NavDropdown.Item>
-                      </LinkContainer>
-                      <LinkContainer to="/admin/userlist">
-                        <NavDropdown.Item>Users</NavDropdown.Item>
-                      </LinkContainer>
-                    </NavDropdown>
-                  )}
-                </Nav>
-              </Navbar.Collapse>
+                  </NavDropdown>
+                ) : (
+                  <Link className="nav-link" to="/signin">
+                    Sign in
+                  </Link>
+                )}
+              </Nav>
             </Container>
           </Navbar>
         </header>
@@ -128,39 +98,9 @@ function App() {
               <Route path="/cart" element={<CartScreen />} />
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />
-              <Route
-                path="/order/:id"
-                element={
-                  <ProtectedRoute>
-                    <OrderScreen />{' '}
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/orders"
-                element={
-                  <ProtectedRoute>
-                    <OrderHistoryScreen />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfileScreen />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Admin Routes */}
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AdminRoute>
-                    <DashboardScreen />
-                  </AdminRoute>
-                }
-              ></Route>
+              <Route path="/order/:id" element={<OrderScreen />} />
+              <Route path="/orders" element={<OrderHistoryScreen />} />
+              <Route path="/profile" element={<ProfileScreen />} />
             </Routes>
           </Container>
         </main>
