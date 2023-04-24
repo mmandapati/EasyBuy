@@ -69,6 +69,31 @@ productRouter.post(
   })
 );
 
+productRouter.put(
+  '/:id/notified',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (product) {
+      if (product.notified.find((x) => x == req.user._id)) {
+        return res
+          .status(400)
+          .send({ message: 'You were already enrolled to notify' });
+      }
+
+      product.notified.push(req.user._id);
+      const updatedProduct = await product.save();
+      res.status(201).send({
+        message: 'Successfully enrolled',
+        user: updatedProduct.notified[updatedProduct.notified.length - 1],
+      });
+    } else {
+      res.status(404).send({ message: 'Product Not Found' });
+    }
+  })
+);
+
 productRouter.get(
   '/admin',
   isAuth,
