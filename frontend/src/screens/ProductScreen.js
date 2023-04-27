@@ -69,6 +69,7 @@ function ProductScreen() {
 
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
+
   const addToCartHandler = async () => {
     const existIteminCart = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existIteminCart ? existIteminCart.quantity + 1 : 1;
@@ -114,6 +115,31 @@ function ProductScreen() {
     } catch (error) {
       toast.error(getError(error));
       dispatch({ type: 'CREATE_FAIL' });
+    }
+  };
+
+  const notifyHandler = async () => {
+    if (userInfo) {
+      try {
+        //check if he is already enrolled
+        const { data } = await axios.put(
+          `/api/products/${product._id}/notified`,
+          { user: userInfo },
+          {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          }
+        );
+        dispatch({
+          type: 'NOTIFY_SUCCESS',
+        });
+        toast.success('You will be notified via mail when the product returns');
+        product.notified.unshift(data.user);
+      } catch (error) {
+        toast.error(getError(error));
+        dispatch({ type: 'NOTIFY_FAIL' });
+      }
+    } else {
+      navigate(`/signin?redirect=/product/${product.slug}`);
     }
   };
 
@@ -172,18 +198,22 @@ function ProductScreen() {
                     </Col>
                   </Row>
                 </ListGroup.Item>
-                {product.countInStock > 0 && (
-                  <ListGroup.Item>
-                    <div className="d-grid">
+                <ListGroup.Item>
+                  <div className="d-grid">
+                    {product.countInStock > 0 ? (
                       <Button
                         onClick={addToCartHandler}
                         variant="outline-primary"
                       >
                         Add to Cart
                       </Button>
-                    </div>
-                  </ListGroup.Item>
-                )}
+                    ) : (
+                      <Button onClick={notifyHandler} variant="warning">
+                        Get Notified
+                      </Button>
+                    )}
+                  </div>
+                </ListGroup.Item>
               </ListGroup>
             </Card.Body>
           </Card>
