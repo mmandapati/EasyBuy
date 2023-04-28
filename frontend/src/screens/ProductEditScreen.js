@@ -78,7 +78,7 @@ export default function ProductEditScreen() {
     e.preventDefault();
     try {
       dispatch({ type: 'UPDATE_REQUEST' });
-      await axios.put(
+      const { data } = await axios.put(
         `/api/products/${productId}`,
         {
           _id: productId,

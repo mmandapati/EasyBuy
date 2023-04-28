@@ -1,7 +1,7 @@
 import express from 'express';
 import Product from '../models/productModel.js';
 import expressAsyncHandler from 'express-async-handler';
-import { isAuth, isAdmin } from '../utils.js';
+import { isAuth, isAdmin, mailgun, notifyEmailTemplate } from '../utils.js';
 
 const productRouter = express.Router();
 
@@ -207,8 +207,23 @@ productRouter.put(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const productId = req.params.id;
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate({
+      path: 'notified',
+      select: 'email name',
+    });
+    let notify = false;
+    let notified = product.notified;
+
     if (product) {
+      //check if the product is outofstock
+      if (
+        product.countInStock === 0 &&
+        product.countInStock !== req.body.countInStock
+      ) {
+        notify = true;
+        console.log('should notify: ', notify);
+      }
+
       product.name = req.body.name;
       product.slug = req.body.slug;
       product.price = req.body.price;
@@ -217,7 +232,39 @@ productRouter.put(
       product.brand = req.body.brand;
       product.countInStock = req.body.countInStock;
       product.description = req.body.description;
+      product.notified = [];
       await product.save();
+
+      if (notify) {
+        if (notified.length > 0) {
+          notified.map((x) => {
+            //const userInformation = user.populate('email name');
+            // To Do:
+            // create a mailgun account with easybuy mail id
+            // Upload on cloud and create a domain to get unauthorized mails to be sent
+            console.log('user email', x.email);
+            console.log('user name', x.name);
+            mailgun()
+              .messages()
+              .send(
+                {
+                  from: 'EasyBuy <manasa.bobba999@gmail.com>',
+                  to: `${x.name} <${x.email}>`,
+                  subject: 'Wait is over, Back in stock',
+                  html: notifyEmailTemplate(product),
+                },
+                (error, body) => {
+                  if (error) {
+                    console.log(error);
+                  } else {
+                    console.log(body);
+                  }
+                }
+              );
+          });
+        }
+      }
+
       res.send({ message: 'Product Updated' });
     } else {
       res.status(404).send({ message: 'Product Not Found' });
