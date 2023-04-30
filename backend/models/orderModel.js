@@ -40,7 +40,7 @@ const orderSchema = new mongoose.Schema(
     },
     seller: { type: mongoose.Schema.Types.ObjectID, ref: 'User' },
     isDelivered: { type: Boolean, deafult: false },
-    DeliveredAt: { type: Date },
+    deliveredAt: { type: Date },
   },
   {
     timestamps: true,
