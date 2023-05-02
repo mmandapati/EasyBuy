@@ -12,13 +12,28 @@ userRouter.post(
     const user = await User.findOne({ email: req.body.email });
     if (user) {
       if (bcrypt.compareSync(req.body.password, user.password)) {
-        res.send({
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin,
-          token: generateToken(user),
-        });
+        if (user.isSeller) {
+          res.send({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isSeller: user.isSeller,
+            sellerName: user.seller.name,
+            sellerLogo: user.seller.logo,
+            sellerDescription: user.seller.description,
+            token: generateToken(user),
+          });
+        } else {
+          res.send({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isSeller: user.isSeller,
+            token: generateToken(user),
+          });
+        }
         return;
       }
     }
@@ -35,13 +50,28 @@ userRouter.post(
       password: bcrypt.hashSync(req.body.password),
     });
     const user = await newUser.save();
-    res.send({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user),
-    });
+    if (user.isSeller) {
+      res.send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        isSeller: user.isSeller,
+        sellerName: user.seller.name,
+        sellerLogo: user.seller.logo,
+        sellerDescription: user.seller.description,
+        token: generateToken(user),
+      });
+    } else {
+      res.send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        isSeller: user.isSeller,
+        token: generateToken(user),
+      });
+    }
   })
 );
 
@@ -56,15 +86,37 @@ userRouter.put(
       if (req.body.password) {
         user.password = bcrypt.hashSync(req.body.password, 8);
       }
+      if (req.body.isSeller) {
+        user.isSeller = req.body.isSeller;
+        user.seller.name = req.body.sellerName || user.seller.name;
+        user.seller.logo = req.body.sellerLogo || user.seller.logo;
+        user.seller.description =
+          req.body.sellerDescription || user.seller.description;
+      }
 
       const updatedUser = await user.save();
-      res.send({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        isAdmin: updatedUser.isAdmin,
-        token: generateToken(updatedUser),
-      });
+      if (user.isSeller) {
+        res.send({
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          isAdmin: updatedUser.isAdmin,
+          isSeller: user.isSeller,
+          sellerName: user.seller.name,
+          sellerLogo: user.seller.logo,
+          sellerDescription: user.seller.description,
+          token: generateToken(updatedUser),
+        });
+      } else {
+        res.send({
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          isAdmin: updatedUser.isAdmin,
+          isSeller: user.isSeller,
+          token: generateToken(updatedUser),
+        });
+      }
     } else {
       res.status(404).send({ message: 'User not found' });
     }

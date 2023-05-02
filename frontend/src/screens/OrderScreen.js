@@ -198,16 +198,17 @@ export default function OrderScreen() {
                     </Col>
                   </Row>
                 </ListGroup.Item>
-                {userInfo.isAdmin && !order.isDelivered && (
-                  <ListGroup.Item>
-                    {loadingDeliver && <LoadingBox></LoadingBox>}
-                    <div className="d-grid">
-                      <Button type="button" onClick={deliverOrderHandler}>
-                        Deliver Order
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                )}
+                {(userInfo.isAdmin || userInfo.isSeller) &&
+                  !order.isDelivered && (
+                    <ListGroup.Item>
+                      {loadingDeliver && <LoadingBox></LoadingBox>}
+                      <div className="d-grid">
+                        <Button type="button" onClick={deliverOrderHandler}>
+                          Deliver Order
+                        </Button>
+                      </div>
+                    </ListGroup.Item>
+                  )}
               </ListGroup>
             </Card.Body>
           </Card>

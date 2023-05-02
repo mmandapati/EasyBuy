@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import { Store } from '../Store';
 import LoadingBox from '../components/LoadingBox';
@@ -67,7 +67,7 @@ export default function ProductListScreen() {
     error: '',
   });
 
-  const { search, pathname } = useLocation();
+  const { search, pathname, seller } = useLocation();
   const navigate = useNavigate();
   const sp = new URLSearchParams(search);
   const page = sp.get('page') || 1;
@@ -78,11 +78,20 @@ export default function ProductListScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(`/api/products/admin?page=${page} `, {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        });
-
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        if (userInfo.isAdmin) {
+          const { data } = await axios.get(
+            `/api/products/admin?page=${page} `,
+            {
+              headers: { Authorization: `Bearer ${userInfo.token}` },
+            }
+          );
+          dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        } else {
+          const { data } = await axios.get(
+            `/api/products/seller?page=${page}&seller=${userInfo._id}`
+          );
+          dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        }
       } catch (err) {}
     };
 
@@ -106,7 +115,11 @@ export default function ProductListScreen() {
         );
         toast.success('product created successfully');
         dispatch({ type: 'CREATE_SUCCESS' });
-        navigate(`/admin/product/${data.product._id}`);
+        if (userInfo.isAdmin) {
+          navigate(`/admin/product/${data.product._id}`);
+        } else {
+          navigate(`/seller/product/${data.product._id}`);
+        }
       } catch (err) {
         toast.error(getError(error));
         dispatch({
@@ -135,7 +148,6 @@ export default function ProductListScreen() {
 
   return (
     <div>
-      <h1>Products</h1>
       <Row>
         <Col>
           <h1>Products</h1>
@@ -177,13 +189,28 @@ export default function ProductListScreen() {
                   <td>{product.category}</td>
                   <td>{product.brand}</td>
                   <td>
-                    <Button
-                      type="button"
-                      variant="outline-primary"
-                      onClick={() => navigate(`/admin/product/${product._id}`)}
-                    >
-                      Edit
-                    </Button>
+                    {userInfo.isAdmin && (
+                      <Button
+                        type="button"
+                        variant="outline-primary"
+                        onClick={() =>
+                          navigate(`/admin/product/${product._id}`)
+                        }
+                      >
+                        Edit
+                      </Button>
+                    )}
+                    {userInfo.isSeller && (
+                      <Button
+                        type="button"
+                        variant="outline-primary"
+                        onClick={() =>
+                          navigate(`/seller/product/${product._id}`)
+                        }
+                      >
+                        Edit
+                      </Button>
+                    )}
                     &nbsp;
                     <Button
                       type="button"

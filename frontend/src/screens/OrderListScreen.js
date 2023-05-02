@@ -51,10 +51,20 @@ export default function OrderListScreen() {
     const fetchData = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
-        const { data } = await axios.get(`/api/orders`, {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        if (userInfo.isAdmin) {
+          const { data } = await axios.get(`/api/orders`, {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        } else {
+          const { data } = await axios.get(
+            `/api/orders?seller=${userInfo._id}`,
+            {
+              headers: { Authorization: `Bearer ${userInfo.token}` },
+            }
+          );
+          dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        }
       } catch (err) {
         dispatch({
           type: 'FETCH_FAIL',

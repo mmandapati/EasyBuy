@@ -1,7 +1,14 @@
 import express from 'express';
 import Product from '../models/productModel.js';
 import expressAsyncHandler from 'express-async-handler';
-import { isAuth, isAdmin, mailgun, notifyEmailTemplate } from '../utils.js';
+import {
+  isAuth,
+  isAdmin,
+  mailgun,
+  notifyEmailTemplate,
+  isSellerOrAdmin,
+  isSeller,
+} from '../utils.js';
 
 const productRouter = express.Router();
 
@@ -14,10 +21,11 @@ const PAGE_SIZE = 3;
 productRouter.post(
   '/',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const newProduct = new Product({
       name: 'sample name ' + Date.now(),
+      seller: req.user._id,
       slug: 'sample-name-' + Date.now(),
       image: '/images/p1.jpg',
       price: 0,
@@ -97,7 +105,7 @@ productRouter.put(
 productRouter.delete(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
@@ -119,6 +127,28 @@ productRouter.get(
     const pageSize = query.pageSize || PAGE_SIZE;
 
     const products = await Product.find()
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    const countProducts = await Product.countDocuments();
+    res.send({
+      products,
+      countProducts,
+      page,
+      pages: Math.ceil(countProducts / pageSize),
+    });
+  })
+);
+
+productRouter.get(
+  '/seller',
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const page = query.page || 1;
+    const pageSize = query.pageSize || PAGE_SIZE;
+    const seller = req.query.seller || '';
+    const sellerFilter = seller ? { seller } : {};
+
+    const products = await Product.find({ ...sellerFilter })
       .skip(pageSize * (page - 1))
       .limit(pageSize);
     const countProducts = await Product.countDocuments();
@@ -219,7 +249,7 @@ productRouter.get(
 productRouter.put(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const productId = req.params.id;
     const product = await Product.findById(productId).populate({

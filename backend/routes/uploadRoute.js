@@ -2,7 +2,7 @@ import express from 'express';
 import multerS3 from 'multer-s3';
 import aws from 'aws-sdk';
 import multer from 'multer';
-import { isAuth, isAdmin } from '../utils.js';
+import { isAuth, isAdmin, isSellerOrAdmin } from '../utils.js';
 import expressAsyncHandler from 'express-async-handler';
 import config from '../config.js';
 
@@ -28,7 +28,7 @@ const uploadS3 = multer({ storage: storageS3 });
 uploadRouter.post(
   '/s3',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   uploadS3.single('image'),
   expressAsyncHandler(async (req, res) => {
     res.send(req.file.location);

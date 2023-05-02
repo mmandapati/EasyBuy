@@ -2,16 +2,22 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
-import { generateToken, isAdmin, isAuth } from '../utils.js';
+import { generateToken, isAdmin, isAuth, isSellerOrAdmin } from '../utils.js';
 
 const orderRouter = express.Router();
 
 orderRouter.get(
   '/',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
-    const orders = await Order.find().populate('user', 'name');
+    const seller = req.query.seller || '';
+    const sellerFilter = seller ? { seller } : {};
+
+    const orders = await Order.find({ ...sellerFilter }).populate(
+      'user',
+      'name'
+    );
     res.send(orders);
   })
 );
@@ -29,6 +35,7 @@ orderRouter.post(
       taxPrice: req.body.taxPrice,
       totalPrice: req.body.totalPrice,
       user: req.user._id,
+      seller: req.body.orderItems[0].seller,
     });
     const order = await newOrder.save();
     res.status(201).send({ message: 'New order created', order });
@@ -76,7 +83,7 @@ orderRouter.put(
 orderRouter.delete(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (order) {

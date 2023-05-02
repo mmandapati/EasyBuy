@@ -106,7 +106,11 @@ export default function ProductEditScreen() {
         type: 'UPDATE_SUCCESS',
       });
       toast.success('Product updated successfylly');
-      navigate('/admin/products');
+      if (userInfo.isAdmin) {
+        navigate('/admin/products');
+      } else {
+        navigate('/seller/products');
+      }
     } catch (err) {
       toast.error(getError(err));
       dispatch({ type: 'UPDATE_FAIL' });

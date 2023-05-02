@@ -27,6 +27,16 @@ export default function ProfileScreen() {
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmpassword] = useState('');
+  const [isSeller, setIsSeller] = useState(userInfo.isSeller);
+  const [sellerName, setSellerName] = useState(
+    userInfo.isSeller ? userInfo.sellerName : ''
+  );
+  const [sellerLogo, setSellerLogo] = useState(
+    userInfo.isSeller ? userInfo.sellerLogo : ''
+  );
+  const [sellerDescription, setSellerDescription] = useState(
+    userInfo.isSeller ? userInfo.sellerDescription : ''
+  );
 
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
@@ -41,6 +51,10 @@ export default function ProfileScreen() {
           name,
           email,
           password,
+          isSeller,
+          sellerName,
+          sellerLogo,
+          sellerDescription,
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -59,6 +73,9 @@ export default function ProfileScreen() {
       toast.error(getError(err));
     }
   };
+  async function sellerHandler() {
+    setIsSeller(true);
+  }
 
   return (
     <Container style={{ maxWidth: '500px' }}>
@@ -98,10 +115,43 @@ export default function ProfileScreen() {
             onChange={(e) => setConfirmpassword(e.target.value)}
           />
         </Form.Group>
+        {(userInfo.isSeller || isSeller) && (
+          <div>
+            <h2>Retailer</h2>
+            <Form.Group className="mb-3" controlId="sellername">
+              <Form.Label>Retailer Name</Form.Label>
+              <Form.Control
+                value={sellerName}
+                onChange={(e) => setSellerName(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="sellerlogo">
+              <Form.Label>Retailer Logo</Form.Label>
+              <Form.Control
+                value={sellerLogo}
+                onChange={(e) => setSellerLogo(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="description">
+              <Form.Label>Retailer Description</Form.Label>
+              <Form.Control
+                value={sellerDescription}
+                onChange={(e) => setSellerDescription(e.target.value)}
+              />
+            </Form.Group>
+          </div>
+        )}
         <div className="mb-3">
           <Button type="submit">Update</Button>
         </div>
       </form>
+      {!userInfo.isSeller && !isSeller && (
+        <Button type="button" onClick={sellerHandler}>
+          Want to Register as Retailer?
+        </Button>
+      )}
     </Container>
   );
 }
