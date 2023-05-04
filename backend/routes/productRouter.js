@@ -13,7 +13,9 @@ import {
 const productRouter = express.Router();
 
 productRouter.get('/', async (req, res) => {
-  const products = await Product.find();
+  const seller = req.query.seller || '';
+  const sellerFilter = seller ? { seller } : {};
+  const products = await Product.find({ ...sellerFilter });
   res.send(products);
 });
 const PAGE_SIZE = 3;

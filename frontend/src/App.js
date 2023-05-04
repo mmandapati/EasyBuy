@@ -33,6 +33,7 @@ import SearchScreen from './screens/SearchScreen';
 import ProductEditScreen from './screens/ProductEditScreen';
 import OrderListScreen from './screens/OrderListScreen';
 import SellerRoute from './components/SellerRoute';
+import SellerScreen from './screens/SellerScreen';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -138,6 +139,9 @@ function App() {
                       <LinkContainer to="/seller/orders">
                         <NavDropdown.Item>Orders</NavDropdown.Item>
                       </LinkContainer>
+                      <LinkContainer to="/seller/sellerview">
+                        <NavDropdown.Item>Seller View</NavDropdown.Item>
+                      </LinkContainer>
                     </NavDropdown>
                   )}
                   {userInfo && userInfo.isAdmin && (
@@ -193,6 +197,7 @@ function App() {
               <Route path="/shipping" element={<ShippingAddressScreen />} />
               <Route path="/product/:slug" element={<ProductScreen />} />
               <Route path="/cart" element={<CartScreen />} />
+              <Route path="/seller/sellerview" element={<SellerScreen />} />
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />

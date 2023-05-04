@@ -12,6 +12,18 @@ body {
   transition: 0.4s;
 }
 
+.row.start {
+  justify-content: flex-start;
+}
+
+.p-1 {
+  padding: 1rem;
+}
+
+.col-3 {
+  flex: 32 1 75rem;
+}
+
 header {
   /* padding: 1rem; */
   border-bottom: medium solid #4447e0;
