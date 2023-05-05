@@ -128,7 +128,7 @@ export default function PlaceOrderScreen() {
                             height: '100px',
                           }}
                         ></img>{' '}
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                        <Link to={`/product/${item._id}`}>{item.name}</Link>
                       </Col>
                       <Col md={2}>${item.quantity}</Col>
                       <Col md={2}>${item.price}</Col>

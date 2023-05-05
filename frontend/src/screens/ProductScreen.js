@@ -20,7 +20,10 @@ import { toast } from 'react-toastify';
 const reducer = (state, action) => {
   switch (action.type) {
     case 'REFRESH_PRODUCT':
-      return { ...state, product: action.payload };
+      return {
+        ...state,
+        product: action.payload,
+      };
     case 'CREATE_REQUEST':
       return { ...state, loadingCreateReview: true };
     case 'CREATE_SUCCESS':
@@ -33,6 +36,12 @@ const reducer = (state, action) => {
       return { ...state, loading: false, product: action.payload };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+    // case 'REVIEW_REQUEST':
+    //   return { ...state, loading: true };
+    // case 'REVIEW_SUCCESS':
+    //   return { ...state, loading: false, reviews: action.payload };
+    case 'REVIEW_FAIL':
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
@@ -44,7 +53,7 @@ function ProductScreen() {
   const [comment, setComment] = useState('');
   const navigate = useNavigate();
   const params = useParams();
-  const { slug } = params;
+  const { id: productId } = params;
   const [{ loading, product, error, loadingCreateReview }, dispatch] =
     useReducer(reducer, {
       loading: true,
@@ -56,7 +65,8 @@ function ProductScreen() {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
       try {
-        const result = await axios.get(`/api/products/slug/${slug}`);
+        const result = await axios.get(`/api/products/${productId}`);
+        //const result = await axios.get(`/api/products/${slug}`);
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
@@ -65,7 +75,24 @@ function ProductScreen() {
       //setProducts(result.data);
     };
     fetchData();
-  }, [slug]);
+  }, [productId]);
+
+  const [reviews, setReviews] = useState([]);
+  useEffect(() => {
+    const fetchReviews = async () => {
+      //dispatch({ type: 'REVIEW_REQUEST' });
+      try {
+        const { data } = await axios.get(`/api/review/${productId}`);
+        setReviews(data);
+        console.log('useEffect reviews', data);
+        console.log('setReviews', reviews);
+        //dispatch({ type: 'REVIEW_SUCCESS', payload: data });
+      } catch (err) {
+        dispatch({ type: 'REVIEW_FAIL', payload: getError(err) });
+      }
+    };
+    fetchReviews();
+  }, [productId]);
 
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
@@ -93,18 +120,44 @@ function ProductScreen() {
       return;
     }
     try {
+      // const { data } = await axios.post(
+      //   `/api/products/${product._id}/reviews`,
+      //   { rating, comment, name: userInfo.name },
+      //   {
+      //     headers: { Authorization: `Bearer ${userInfo.token}` },
+      //   }
+      // );
+      // dispatch({
+      //   type: 'CREATE_SUCCESS',
+      // });
+      // toast.success('Review submitted successfully');
+      // product.reviews.unshift(data.review);
+      // product.numReviews = data.numReviews;
+      // product.rating = data.rating;
+      // dispatch({ type: 'REFRESH_PRODUCT', payload: product });
+      // window.scrollTo({
+      //   behavior: 'smooth',
+      //   top: reviewsRef.current.offsetTop,
+      // });
+      dispatch({ type: 'CREATE_REQUEST' });
       const { data } = await axios.post(
-        `/api/products/${product._id}/reviews`,
-        { rating, comment, name: userInfo.name },
+        '/api/review',
+        {
+          name: userInfo.name,
+          user: userInfo._id,
+          product: product._id,
+          comment,
+          rating,
+        },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
-      dispatch({
-        type: 'CREATE_SUCCESS',
-      });
+      var newReviews = reviews.concat([data.review]);
+      setReviews(newReviews);
+      console.log('reviews', reviews);
+      dispatch({ type: 'CREATE_SUCCESS' });
       toast.success('Review submitted successfully');
-      product.reviews.unshift(data.review);
       product.numReviews = data.numReviews;
       product.rating = data.rating;
       dispatch({ type: 'REFRESH_PRODUCT', payload: product });
@@ -139,7 +192,7 @@ function ProductScreen() {
         dispatch({ type: 'NOTIFY_FAIL' });
       }
     } else {
-      navigate(`/signin?redirect=/product/${product.slug}`);
+      navigate(`/signin?redirect=/product/${product._id}`);
     }
   };
 
@@ -222,12 +275,10 @@ function ProductScreen() {
       <div className="my-3">
         <h2 ref={reviewsRef}>Reviews</h2>
         <div className="mb-3">
-          {product.reviews.length === 0 && (
-            <MessageBox>There is no review</MessageBox>
-          )}
+          {reviews.length === 0 && <MessageBox>There is no review</MessageBox>}
         </div>
         <ListGroup>
-          {product.reviews.map((review) => (
+          {reviews.map((review) => (
             <ListGroup.Item key={review._id}>
               <strong>{review.name}</strong>
               <Rating rating={review.rating} caption=" "></Rating>
@@ -277,7 +328,7 @@ function ProductScreen() {
           ) : (
             <MessageBox>
               Please{' '}
-              <Link to={`/signin?redirect=/product/${product.slug}`}>
+              <Link to={`/signin?redirect=/product/${product._id}`}>
                 SignIn
               </Link>{' '}
               to write a review

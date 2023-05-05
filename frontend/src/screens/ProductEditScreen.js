@@ -49,7 +49,6 @@ export default function ProductEditScreen() {
     });
 
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState('');
   const [category, setCategory] = useState('');
@@ -63,7 +62,6 @@ export default function ProductEditScreen() {
         dispatch({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/products/${productId}`);
         setName(data.name);
-        setSlug(data.slug);
         setPrice(data.price);
         setImage(data.image);
         setCategory(data.category);
@@ -90,7 +88,6 @@ export default function ProductEditScreen() {
         {
           _id: productId,
           name,
-          slug,
           price,
           image,
           category,
@@ -117,6 +114,7 @@ export default function ProductEditScreen() {
     }
   };
   const uploadFileHandler = async (e) => {
+    e.preventDefault();
     const file = e.target.files[0];
     const bodyFormData = new FormData();
     bodyFormData.append('image', file);
@@ -157,14 +155,6 @@ export default function ProductEditScreen() {
             <Form.Control
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="slug">
-            <Form.Label>Slug</Form.Label>
-            <Form.Control
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
               required
             />
           </Form.Group>

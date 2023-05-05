@@ -32,14 +32,6 @@ export default function SellerScreen() {
     products: [],
   });
 
-  const { search, pathname, seller } = useLocation();
-  const navigate = useNavigate();
-  const sp = new URLSearchParams(search);
-  const page = sp.get('page') || 1;
-
-  const params = useParams();
-  const { slug } = params;
-
   const { state } = useContext(Store);
   const { userInfo } = state;
   useEffect(() => {
@@ -103,7 +95,7 @@ export default function SellerScreen() {
       </div> */}
       <Row>
         {products.map((product) => (
-          <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+          <Col key={product._id} sm={6} md={4} lg={3} className="mb-3">
             <Product product={product}></Product>
           </Col>
         ))}

@@ -13,12 +13,10 @@ import {
 const productRouter = express.Router();
 
 productRouter.get('/', async (req, res) => {
-  const seller = req.query.seller || '';
-  const sellerFilter = seller ? { seller } : {};
-  const products = await Product.find({ ...sellerFilter });
+  const products = await Product.find();
   res.send(products);
 });
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 10;
 
 productRouter.post(
   '/',
@@ -28,7 +26,6 @@ productRouter.post(
     const newProduct = new Product({
       name: 'sample name ' + Date.now(),
       seller: req.user._id,
-      slug: 'sample-name-' + Date.now(),
       image: '/images/p1.jpg',
       price: 0,
       category: 'sample category',
@@ -272,7 +269,6 @@ productRouter.put(
       }
 
       product.name = req.body.name;
-      product.slug = req.body.slug;
       product.price = req.body.price;
       product.image = req.body.image;
       product.category = req.body.category;
@@ -319,8 +315,8 @@ productRouter.put(
   })
 );
 
-productRouter.get('/slug/:slug', async (req, res) => {
-  const product = await Product.findOne({ slug: req.params.slug });
+productRouter.get('/slug/:id', async (req, res) => {
+  const product = await Product.findById(req.params.id);
   if (product) {
     res.send(product);
   } else {

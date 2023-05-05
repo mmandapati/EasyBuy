@@ -63,7 +63,7 @@ export default function CartScreen() {
                           height: '100px',
                         }}
                       ></img>{' '}
-                      <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                      <Link to={`/product/${item._id}`}>{item.name}</Link>
                     </Col>
                     <Col md={3}>
                       <Button
