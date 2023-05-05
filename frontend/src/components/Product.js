@@ -5,6 +5,8 @@ import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import { Store } from '../Store';
 import Rating from './Rating';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function Product(props) {
   const { product } = props;
@@ -43,19 +45,32 @@ function Product(props) {
           <Card.Title style={{ color: '#4447e0' }}>{product.name}</Card.Title>
         </Link>
         <Rating rating={product.rating} numReviews={product.numReviews} />
+
         <Card.Text>${product.price}</Card.Text>
-        {product.countInStock === 0 ? (
-          <Button variant="warning" disabled>
-            Out of Stock
-          </Button>
-        ) : (
-          <Button
-            variant="outline-primary"
-            onClick={() => addToCartHandler(product)}
-          >
-            Add to Cart
-          </Button>
-        )}
+        <Row>
+          <Col>
+            <Link
+              to={`/seller/sellerview/${product.seller._id}`}
+              style={{ color: '#bb8130', textDecoration: 'none' }}
+            >
+              {product.seller.seller.name}
+            </Link>
+          </Col>
+          <Col>
+            {product.countInStock === 0 ? (
+              <Button variant="warning" disabled>
+                Out of Stock
+              </Button>
+            ) : (
+              <Button
+                variant="outline-primary"
+                onClick={() => addToCartHandler(product)}
+              >
+                Add to Cart
+              </Button>
+            )}
+          </Col>
+        </Row>
       </Card.Body>
     </Card>
   );

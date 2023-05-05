@@ -13,7 +13,10 @@ import {
 const productRouter = express.Router();
 
 productRouter.get('/', async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.find().populate({
+    path: 'seller',
+    select: 'seller.name seller.logo',
+  });
   res.send(products);
 });
 const PAGE_SIZE = 12;
@@ -149,7 +152,11 @@ productRouter.get(
 
     const products = await Product.find({ ...sellerFilter })
       .skip(pageSize * (page - 1))
-      .limit(pageSize);
+      .limit(pageSize)
+      .populate({
+        path: 'seller',
+        select: 'seller.name seller.logo',
+      });
     const countProducts = await Product.countDocuments({ ...sellerFilter });
     res.send({
       products,
@@ -221,7 +228,11 @@ productRouter.get(
     })
       .sort(sortOrder)
       .skip(pageSize * (page - 1))
-      .limit(pageSize);
+      .limit(pageSize)
+      .populate({
+        path: 'seller',
+        select: 'seller.name seller.logo',
+      });
 
     const countProducts = await Product.countDocuments({
       ...queryFilter,
@@ -325,7 +336,10 @@ productRouter.get('/slug/:id', async (req, res) => {
 });
 
 productRouter.get('/:id', async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate({
+    path: 'seller',
+    select: 'seller.name seller.rating seller.numReviews',
+  });
   if (product) {
     res.send(product);
   } else {

@@ -235,6 +235,20 @@ function ProductScreen() {
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
+                    <Link
+                      to={`/seller/sellerview/${product.seller._id}`}
+                      style={{ color: '#bb8130', textDecoration: 'none' }}
+                    >
+                      {product.seller.seller.name}
+                    </Link>
+                    <Rating
+                      rating={product.seller.seller.rating}
+                      numReviews={product.seller.seller.numReviews}
+                    />
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
                     <Col>Price:</Col>
                     <Col>${product.price}</Col>
                   </Row>
