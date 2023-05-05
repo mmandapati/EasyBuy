@@ -16,7 +16,7 @@ productRouter.get('/', async (req, res) => {
   const products = await Product.find();
   res.send(products);
 });
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 productRouter.post(
   '/',
@@ -150,7 +150,7 @@ productRouter.get(
     const products = await Product.find({ ...sellerFilter })
       .skip(pageSize * (page - 1))
       .limit(pageSize);
-    const countProducts = await Product.countDocuments();
+    const countProducts = await Product.countDocuments({ ...sellerFilter });
     res.send({
       products,
       countProducts,

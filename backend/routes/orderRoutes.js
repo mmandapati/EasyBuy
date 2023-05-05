@@ -117,6 +117,14 @@ orderRouter.put(
       order.isDelivered = true;
       order.deliveredAt = Date.now();
       await order.save();
+      order.orderItems.map(async (orderProduct) => {
+        const product = await Product.findById(orderProduct.product);
+        if (product) {
+          product.countInStock = product.countInStock - orderProduct.quantity;
+          product.counter = (product.counter ? product.counter : 0) + 1;
+          await product.save();
+        }
+      });
       res.send({ message: 'Order Delivered' });
     } else {
       res.status(404).send({ message: 'Order Not Found' });

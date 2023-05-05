@@ -34,6 +34,7 @@ import ProductEditScreen from './screens/ProductEditScreen';
 import OrderListScreen from './screens/OrderListScreen';
 import SellerRoute from './components/SellerRoute';
 import SellerScreen from './screens/SellerScreen';
+import CustomerBoard from './screens/CustomerBoard';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -139,9 +140,9 @@ function App() {
                       <LinkContainer to="/seller/orders">
                         <NavDropdown.Item>Orders</NavDropdown.Item>
                       </LinkContainer>
-                      <LinkContainer to="/seller/sellerview">
+                      {/* <LinkContainer to="/seller/sellerview">
                         <NavDropdown.Item>Seller View</NavDropdown.Item>
-                      </LinkContainer>
+                      </LinkContainer> */}
                     </NavDropdown>
                   )}
                   {userInfo && userInfo.isAdmin && (
@@ -191,13 +192,13 @@ function App() {
         <main>
           <Container className="mt-3">
             <Routes>
-              <Route path="/" element={<HomeScreen />} />
+              <Route path="/" element={<CustomerBoard />} />
               <Route path="/signin" element={<SigninScreen />} />
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/shipping" element={<ShippingAddressScreen />} />
               <Route path="/product/:id" element={<ProductScreen />} />
               <Route path="/cart" element={<CartScreen />} />
-              <Route path="/seller/sellerview" element={<SellerScreen />} />
+              <Route path="/seller/sellerview/:id" element={<SellerScreen />} />
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />

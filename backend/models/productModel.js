@@ -12,6 +12,7 @@ const productSchema = new mongoose.Schema(
     countInStock: { type: Number, required: true },
     rating: { type: Number, required: true },
     numReviews: { type: Number, required: true },
+    counter: { type: Number, requires: true },
     notified: [
       {
         type: mongoose.Schema.Types.ObjectId,
