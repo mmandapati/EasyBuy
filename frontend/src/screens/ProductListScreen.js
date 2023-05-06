@@ -225,15 +225,25 @@ export default function ProductListScreen() {
             </tbody>
           </table>
           <div>
-            {[...Array(pages).keys()].map((x) => (
-              <Link
-                className={x + 1 === Number(page) ? 'btn text-bold' : 'btn'}
-                key={x + 1}
-                to={`/admin/products?page=${x + 1}`}
-              >
-                {x + 1}
-              </Link>
-            ))}
+            {userInfo.isAdmin
+              ? [...Array(pages).keys()].map((x) => (
+                  <Link
+                    className={x + 1 === Number(page) ? 'btn text-bold' : 'btn'}
+                    key={x + 1}
+                    to={`/admin/products?page=${x + 1}`}
+                  >
+                    {x + 1}
+                  </Link>
+                ))
+              : [...Array(pages).keys()].map((x) => (
+                  <Link
+                    className={x + 1 === Number(page) ? 'btn text-bold' : 'btn'}
+                    key={x + 1}
+                    to={`/seller/products?page=${x + 1}`}
+                  >
+                    {x + 1}
+                  </Link>
+                ))}
           </div>
         </>
       )}
