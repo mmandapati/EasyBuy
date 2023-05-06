@@ -6,12 +6,26 @@ import { Link } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import Carousel from 'react-bootstrap/Carousel';
 import Product from '../components/Product';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_REQUEST':
+      return { ...state, loading: true };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, topSellers: action.payload };
+    case 'FETCH_FAIL':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 function CustomerBoard() {
   const [categories, setCategories] = useState([]);
@@ -26,18 +40,82 @@ function CustomerBoard() {
     };
     fetchCategories();
   }, []);
+  const [{ loading, topSellers, error }, dispatch] = useReducer(reducer, {
+    loading: true,
+    topSellers: [],
+    error: '',
+  });
+  useEffect(() => {
+    const fetchTopSellers = async () => {
+      dispatch({ type: 'FETCH_REQUEST' });
+      try {
+        const { data } = await axios.get('/api/users/top-sellers');
+        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+      } catch (err) {
+        dispatch({ type: 'FETCH_FAIL', payload: err.message });
+      }
+    };
+    fetchTopSellers();
+  }, []);
   return (
     <div>
       <Helmet>
         <title>EasyBuy</title>
       </Helmet>
-      <h1>Welcome to Easy Buy</h1>
-      <h2>Choose the category or search for the products</h2>
+      <h4>TOP PICKS FOR YOU</h4>
+      {loading ? (
+        <LoadingBox></LoadingBox>
+      ) : error ? (
+        <MessageBox variant="danger">{error}</MessageBox>
+      ) : (
+        <>
+          {topSellers.length === 0 && <MessageBox>No Seller Found</MessageBox>}
+          {/* <Carousel showArrows autoPlay showThumbs={false}>
+            {topSellers.map((seller) => (
+              <div key={seller._id}>
+                <Link to={`/seller/sellerview/${seller._id}`}>
+                  <img src={seller.seller.logo} alt={seller.seller.name} />
+                  <p className="legend">{seller.seller.name}</p>
+                </Link>
+              </div>
+            ))}
+          </Carousel> */}
+          <Carousel variant="dark">
+            {topSellers.map((seller) => (
+              <Carousel.Item interval={2000}>
+                <Link to={`/seller/sellerview/${seller._id}`}>
+                  <img
+                    className="d-block w-100"
+                    src={seller.seller.logo}
+                    alt={seller.seller.name}
+                    style={{
+                      height: '400px',
+                    }}
+                  />
+                </Link>
+                <Carousel.Caption>
+                  <h5>{seller.seller.name}</h5>
+                  <p>{seller.seller.description}</p>
+                </Carousel.Caption>
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </>
+      )}
+
+      <h4>CATEGORIES TO BAG</h4>
       <div className="category">
         <Row>
           {categories.map((category) => (
-            <Col key={category} sm={8} md={6} lg={4} className="mb-3">
+            <Col key={category} sm={8} md={6} lg={2} className="mb-3">
               <Card className="mb-3">
+                <Link to={`/search?category=${category}`}>
+                  <img
+                    src={`https://easybuy-images.s3.us-west-1.amazonaws.com/${category}.png`}
+                    className="card-img-top"
+                    alt={category}
+                  />
+                </Link>
                 <Card.Body>
                   <Card.Text>
                     <Link to={`/search?category=${category}`}>
@@ -50,7 +128,7 @@ function CustomerBoard() {
           ))}
         </Row>
       </div>
-      <h1> Recommendations:</h1>
+      <h4>YOU MAY ALSO LIKE</h4>
     </div>
   );
 }
