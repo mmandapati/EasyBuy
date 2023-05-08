@@ -1,7 +1,7 @@
 //import data from '../data';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
-import { useEffect, useReducer, useState } from 'react';
+import { useContext, useEffect, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -13,6 +13,8 @@ import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
+import { Store } from '../Store';
+import RecommendProduct from '../components/recommendProduct';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -22,6 +24,15 @@ const reducer = (state, action) => {
       return { ...state, loading: false, topSellers: action.payload };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+    case 'RECOMMEND_REQUEST':
+      return { ...state, loadingRecommend: true };
+    case 'RECOMMEND_SUCCESS':
+      return { ...state, loadingRecommend: false, recommends: action.payload };
+    case 'RECOMMEND_FAIL':
+      return {
+        ...state,
+        loadingRecommend: false,
+      };
     default:
       return state;
   }
@@ -40,11 +51,18 @@ function CustomerBoard() {
     };
     fetchCategories();
   }, []);
-  const [{ loading, topSellers, error }, dispatch] = useReducer(reducer, {
+  const [
+    { loading, topSellers, error, loadingRecommend, recommends },
+    dispatch,
+  ] = useReducer(reducer, {
     loading: true,
     topSellers: [],
     error: '',
+    loadingRecommend: true,
+    recommends: [],
   });
+  const { state } = useContext(Store);
+  const { userInfo } = state;
   useEffect(() => {
     const fetchTopSellers = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -57,6 +75,20 @@ function CustomerBoard() {
     };
     fetchTopSellers();
   }, []);
+  useEffect(() => {
+    const fetchContentRecommend = async () => {
+      dispatch({ type: 'RECOMMEND_REQUEST' });
+      try {
+        const { data } = await axios.get(
+          `/api/recommends/content/${userInfo._id}`
+        );
+        dispatch({ type: 'RECOMMEND_SUCCESS', payload: data.productIds });
+      } catch (err) {
+        dispatch({ type: 'RECOMMEND_FAIL', payload: err.message });
+      }
+    };
+    fetchContentRecommend();
+  }, [userInfo]);
   return (
     <div>
       <Helmet>
@@ -70,16 +102,6 @@ function CustomerBoard() {
       ) : (
         <>
           {topSellers.length === 0 && <MessageBox>No Seller Found</MessageBox>}
-          {/* <Carousel showArrows autoPlay showThumbs={false}>
-            {topSellers.map((seller) => (
-              <div key={seller._id}>
-                <Link to={`/seller/sellerview/${seller._id}`}>
-                  <img src={seller.seller.logo} alt={seller.seller.name} />
-                  <p className="legend">{seller.seller.name}</p>
-                </Link>
-              </div>
-            ))}
-          </Carousel> */}
           <Carousel variant="dark">
             {topSellers.map((seller) => (
               <Carousel.Item interval={2000}>
@@ -128,7 +150,23 @@ function CustomerBoard() {
           ))}
         </Row>
       </div>
-      <h4>YOU MAY ALSO LIKE</h4>
+
+      {loadingRecommend ? (
+        <LoadingBox></LoadingBox>
+      ) : (
+        recommends.length > 0 && (
+          <div>
+            <h4>YOU MAY ALSO LIKE</h4>
+            <Row>
+              {recommends.map((productId) => (
+                <Col sm={8} lg={2} key={productId}>
+                  <RecommendProduct productId={productId}></RecommendProduct>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        )
+      )}
     </div>
   );
 }
