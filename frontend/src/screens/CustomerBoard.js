@@ -27,7 +27,12 @@ const reducer = (state, action) => {
     case 'RECOMMEND_REQUEST':
       return { ...state, loadingRecommend: true };
     case 'RECOMMEND_SUCCESS':
-      return { ...state, loadingRecommend: false, recommends: action.payload };
+      return {
+        ...state,
+        loadingRecommend: false,
+        contentProducts: action.payload.contentProducts,
+        collabProducts: action.payload.collabProducts,
+      };
     case 'RECOMMEND_FAIL':
       return {
         ...state,
@@ -52,14 +57,22 @@ function CustomerBoard() {
     fetchCategories();
   }, []);
   const [
-    { loading, topSellers, error, loadingRecommend, recommends },
+    {
+      loading,
+      topSellers,
+      error,
+      loadingRecommend,
+      contentProducts,
+      collabProducts,
+    },
     dispatch,
   ] = useReducer(reducer, {
     loading: true,
     topSellers: [],
     error: '',
     loadingRecommend: true,
-    recommends: [],
+    contentProducts: [],
+    collabProducts: [],
   });
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -79,16 +92,16 @@ function CustomerBoard() {
     const fetchContentRecommend = async () => {
       dispatch({ type: 'RECOMMEND_REQUEST' });
       try {
-        const { data } = await axios.get(
-          `/api/recommends/content/${userInfo._id}`
-        );
-        dispatch({ type: 'RECOMMEND_SUCCESS', payload: data.productIds });
+        const { data } = await axios.get(`/api/recommends/${userInfo._id}`);
+        dispatch({ type: 'RECOMMEND_SUCCESS', payload: data });
+        console.log('recommend', data.recommend);
       } catch (err) {
         dispatch({ type: 'RECOMMEND_FAIL', payload: err.message });
       }
     };
     fetchContentRecommend();
   }, [userInfo]);
+  //console.log('after recommend', recommend);
   return (
     <div>
       <Helmet>
@@ -154,18 +167,32 @@ function CustomerBoard() {
       {loadingRecommend ? (
         <LoadingBox></LoadingBox>
       ) : (
-        recommends.length > 0 && (
-          <div>
-            <h4>YOU MAY ALSO LIKE</h4>
-            <Row>
-              {recommends.map((productId) => (
-                <Col sm={8} lg={2} key={productId}>
-                  <RecommendProduct productId={productId}></RecommendProduct>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        )
+        <div>
+          {contentProducts.length > 0 && (
+            <div>
+              <h4>YOU MAY ALSO LIKE</h4>
+              <Row>
+                {contentProducts.map((productId) => (
+                  <Col sm={8} lg={2} key={productId}>
+                    <RecommendProduct productId={productId}></RecommendProduct>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          )}
+          {collabProducts.length > 0 && (
+            <div>
+              <h4>CUSTOMERS ALSO BOUGHT</h4>
+              <Row>
+                {collabProducts.map((productId) => (
+                  <Col sm={8} lg={2} key={productId}>
+                    <RecommendProduct productId={productId}></RecommendProduct>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

@@ -39,6 +39,7 @@ function reducer(state, action) {
         cart: {
           ...state.cart,
           cartItems,
+          error: '',
         },
       };
     case 'CART_REMOVE_ITEM': {
@@ -53,11 +54,18 @@ function reducer(state, action) {
         cart: {
           ...state.cart,
           cartItems,
+          error: '',
         },
       };
     }
+    case 'CART_ADD_ITEM_FAIL': {
+      return {
+        ...state,
+        cart: { ...state.cart, error: action.payload },
+      };
+    }
     case 'CLEAR_CART':
-      return { ...state, cart: { ...state.cart, cartItems: [] } };
+      return { ...state, cart: { ...state.cart, error: '', cartItems: [] } };
     case 'USER_SIGNIN':
       return { ...state, userInfo: action.payload };
     case 'USER_SIGNOUT':

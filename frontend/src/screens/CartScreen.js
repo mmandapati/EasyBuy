@@ -14,7 +14,7 @@ export default function CartScreen() {
   const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const {
-    cart: { cartItems },
+    cart: { cartItems, error },
   } = state;
 
   const updateCartHandler = async (item, quantity) => {
@@ -45,6 +45,7 @@ export default function CartScreen() {
       <h1>Shopping Cart</h1>
       <Row>
         <Col md={8}>
+          {error && <MessageBox variant="danger">{error}</MessageBox>}
           {cartItems.length === 0 ? (
             <MessageBox>
               Cart is empty. <Link to="/">Go Shopping</Link>
@@ -109,7 +110,10 @@ export default function CartScreen() {
                   <h3>
                     Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}
                     items: $
-                    {cartItems.reduce((a, c) => a + c.price * c.quantity, 0)})
+                    {Math.floor(
+                      cartItems.reduce((a, c) => a + c.price * c.quantity, 0)
+                    )}
+                    )
                   </h3>
                 </ListGroup.Item>
 

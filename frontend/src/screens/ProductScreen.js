@@ -106,10 +106,20 @@ function ProductScreen() {
       window.alert('Sorry. Quantity not available, Please check');
       return;
     }
-    ctxDispatch({
-      type: 'CART_ADD_ITEM',
-      payload: { ...product, quantity },
-    });
+    if (
+      cart.cartItems.length > 0 &&
+      data.seller._id !== cart.cartItems[0].seller._id
+    ) {
+      ctxDispatch({
+        type: 'CART_ADD_ITEM_FAIL',
+        payload: `Please add products from ${cart.cartItems[0].seller.seller.name}. Place an other order for ${data.seller.seller.name} Products`,
+      });
+    } else {
+      ctxDispatch({
+        type: 'CART_ADD_ITEM',
+        payload: { ...product, quantity },
+      });
+    }
     navigate('/cart');
   };
 

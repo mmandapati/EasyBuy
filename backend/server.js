@@ -10,7 +10,7 @@ import orderRouter from './routes/orderRoutes.js';
 import uploadRouter from './routes/uploadRoute.js';
 import reviewRouter from './routes/reviewRouter.js';
 import productSeedRouter from './routes/productSeedRouter.js';
-import contentRouter from './routes/contentRoutes.js';
+import recommendRouter from './routes/recommendRoutes.js';
 
 dotenv.config();
 mongoose
@@ -34,7 +34,7 @@ app.use('/api/orders', orderRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/review', reviewRouter);
 app.use('/api/insertProducts', productSeedRouter);
-app.use('/api/recommends', contentRouter);
+app.use('/api/recommends', recommendRouter);
 // app.get('/api/products', (req, res) => {
 //   res.send(data.products);
 // });
