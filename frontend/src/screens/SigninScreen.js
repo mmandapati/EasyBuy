@@ -31,7 +31,11 @@ export default function SigninScreen() {
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       console.log('submit handler', redirect);
-      navigate(redirect || '/');
+      if (data.isSeller) {
+        navigate('/seller/dashboard');
+      } else {
+        navigate(redirect || '/');
+      }
     } catch (err) {
       toast.error(getError(err));
     }

@@ -35,6 +35,9 @@ import OrderListScreen from './screens/OrderListScreen';
 import SellerRoute from './components/SellerRoute';
 import SellerScreen from './screens/SellerScreen';
 import CustomerBoard from './screens/CustomerBoard';
+import SellerDashboard from './screens/SellerDashboardScreen';
+import ProductsOutOfStock from './screens/ProductsOutOfStock';
+import AddProduct from './screens/AddProduct';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -140,9 +143,11 @@ function App() {
                       <LinkContainer to="/seller/orders">
                         <NavDropdown.Item>Orders</NavDropdown.Item>
                       </LinkContainer>
-                      {/* <LinkContainer to="/seller/sellerview">
-                        <NavDropdown.Item>Seller View</NavDropdown.Item>
-                      </LinkContainer> */}
+                      <LinkContainer to="/seller/productsOutOfStock">
+                        <NavDropdown.Item>
+                          Products Out Of Stock
+                        </NavDropdown.Item>
+                      </LinkContainer>
                     </NavDropdown>
                   )}
                   {userInfo && userInfo.isAdmin && (
@@ -202,6 +207,12 @@ function App() {
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />
+              <Route path="/seller/dashboard" element={<SellerDashboard />} />
+              <Route path="/seller/addproduct" element={<AddProduct />} />
+              <Route
+                path="/seller/productsOutOfStock"
+                element={<ProductsOutOfStock />}
+              />
               <Route
                 path="/order/:id"
                 element={
@@ -263,9 +274,9 @@ function App() {
               <Route
                 path="/seller/dashboard"
                 element={
-                  <AdminRoute>
-                    <DashboardScreen />
-                  </AdminRoute>
+                  <SellerRoute>
+                    <SellerDashboard />
+                  </SellerRoute>
                 }
               ></Route>
               <Route
@@ -289,6 +300,14 @@ function App() {
                 element={
                   <SellerRoute>
                     <ProductEditScreen />
+                  </SellerRoute>
+                }
+              ></Route>
+              <Route
+                path="/seller/productsOutOfStock"
+                element={
+                  <SellerRoute>
+                    <ProductsOutOfStock />
                   </SellerRoute>
                 }
               ></Route>

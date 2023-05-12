@@ -118,7 +118,7 @@ export default function ProductListScreen() {
         if (userInfo.isAdmin) {
           navigate(`/admin/product/${data.product._id}`);
         } else {
-          navigate(`/seller/product/${data.product._id}`);
+          navigate(`/seller/addproduct`);
         }
       } catch (err) {
         toast.error(getError(error));
@@ -154,7 +154,10 @@ export default function ProductListScreen() {
         </Col>
         <Col className="col text-end">
           <div>
-            <Button type="button" onClick={createHandler}>
+            <Button
+              type="button"
+              onClick={() => navigate('/seller/addproduct')}
+            >
               Create Product
             </Button>
           </div>

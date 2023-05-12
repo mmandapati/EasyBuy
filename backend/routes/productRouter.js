@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/productModel.js';
+import mongoose from 'mongoose';
 import expressAsyncHandler from 'express-async-handler';
 import {
   isAuth,
@@ -27,16 +28,16 @@ productRouter.post(
   isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const newProduct = new Product({
-      name: 'sample name ' + Date.now(),
+      name: req.body.name,
       seller: req.user._id,
-      image: '/images/p1.jpg',
-      price: 0,
-      category: 'sample category',
-      brand: 'sample brand',
-      countInStock: 0,
+      image: req.body.image,
+      price: req.body.price,
+      category: req.body.category,
+      brand: req.body.brand,
+      countInStock: req.body.countInStock,
       rating: 0,
       numReviews: 0,
-      description: 'sample description',
+      description: req.body.description,
     });
     const product = await newProduct.save();
     res.send({ message: 'Product Created', product });
@@ -168,6 +169,32 @@ productRouter.get(
 );
 
 productRouter.get(
+  '/seller/productsOutOfStock',
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const page = query.page || 1;
+    const pageSize = query.pageSize || PAGE_SIZE;
+    const seller = req.query.seller || '';
+    const sellerFilter = seller ? { seller } : {};
+
+    const sellId = new mongoose.Types.ObjectId(req.query.seller);
+
+    const productsOutOfStock = await Product.find(
+      {
+        seller: sellId,
+        countInStock: 0,
+        notified: { $gt: [] },
+      },
+      { productId: 1, name: '$name', notifiedSize: { $size: '$notified' } }
+    );
+
+    console.log('notified length', productsOutOfStock);
+
+    res.send(productsOutOfStock);
+  })
+);
+
+productRouter.get(
   '/search',
   expressAsyncHandler(async (req, res) => {
     const { query } = req;
@@ -276,7 +303,7 @@ productRouter.put(
         product.countInStock !== req.body.countInStock
       ) {
         notify = true;
-        console.log('should notify: ', notify);
+        // console.log('should notify: ', notify);
       }
 
       product.name = req.body.name;
@@ -296,8 +323,8 @@ productRouter.put(
             // To Do:
             // create a mailgun account with easybuy mail id
             // Upload on cloud and create a domain to get unauthorized mails to be sent
-            console.log('user email', x.email);
-            console.log('user name', x.name);
+            // console.log('user email', x.email);
+            // console.log('user name', x.name);
             mailgun()
               .messages()
               .send(

@@ -19,7 +19,12 @@ export default function ShippingAddressScreen() {
   const [postalCode, setPostalCode] = useState(
     shippingAddress.postalCode || ''
   );
+  const [isValidPostalCode, setIsValidPostalCode] = useState(false);
   const [country, setCountry] = useState(shippingAddress.country || '');
+
+  const handlePostalCodeChange = (e) => {
+    setPostalCode(e.target.value);
+  };
 
   useEffect(() => {
     if (!userInfo) {
@@ -29,6 +34,11 @@ export default function ShippingAddressScreen() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (!/^\d{5}(?:[-\s]\d{4})?$/.test(postalCode)) {
+      alert('Please enter a valid US Postal Code.');
+      return;
+    }
+
     ctxDispatch({
       type: 'SAVE_SHIPPING_ADDRESS',
       payload: {
@@ -87,10 +97,15 @@ export default function ShippingAddressScreen() {
           <Form.Group className="mb-3" controlId="postalCode">
             <Form.Label>Postal Code</Form.Label>
             <Form.Control
+              type="text"
               value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
+              onChange={handlePostalCodeChange}
+              pattern="^\d{5}(?:[-\s]\d{4})?$"
               required
             />
+            <Form.Control.Feedback type="invalid">
+              Please enter a valid US Postal Code.
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="country">
             <Form.Label>Country</Form.Label>
