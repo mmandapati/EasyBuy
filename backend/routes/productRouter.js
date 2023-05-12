@@ -152,6 +152,7 @@ productRouter.get(
     const sellerFilter = seller ? { seller } : {};
 
     const products = await Product.find({ ...sellerFilter })
+      .sort({ createdAt: -1 })
       .skip(pageSize * (page - 1))
       .limit(pageSize)
       .populate({
