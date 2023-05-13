@@ -18,10 +18,9 @@ orderRouter.get(
     const seller = req.query.seller || '';
     const sellerFilter = seller ? { seller } : {};
 
-    const orders = await Order.find({ ...sellerFilter }).populate(
-      'user',
-      'name'
-    );
+    const orders = await Order.find({ ...sellerFilter })
+      .sort({ createdAt: -1 })
+      .populate('user', 'name');
     res.send(orders);
   })
 );
@@ -92,7 +91,9 @@ orderRouter.get(
   '/mine',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const orders = await Order.find({ user: req.user._id });
+    const orders = await Order.find({ user: req.user._id }).sort({
+      createdAt: -1,
+    });
     res.send(orders);
   })
 );
