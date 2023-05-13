@@ -207,7 +207,6 @@ orderRouter.get(
     const arrayDetails30 = await Product.aggregate([
       {
         $match: {
-          seller: sellId,
           price: { $lt: 30 },
         },
       },
@@ -222,7 +221,6 @@ orderRouter.get(
     const arrayDetails60 = await Product.aggregate([
       {
         $match: {
-          seller: sellId,
           price: { $gte: 31, $lte: 60 },
         },
       },
@@ -237,7 +235,6 @@ orderRouter.get(
     const arrayDetails90 = await Product.aggregate([
       {
         $match: {
-          seller: sellId,
           price: { $gte: 60 },
         },
       },
