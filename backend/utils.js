@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import mg from 'mailgun-js';
+import {spawn} from 'child_process';
+import Recommend from './models/recommendModel.js';
 
 export const generateToken = (user) => {
   return jwt.sign(
@@ -82,4 +84,65 @@ export const notifyEmailTemplate = (product, name) => {
         />
         <p> Happy shopping<br>
         Team Easybuy</p>`;
+};
+
+// Function for calling python code
+export const triggerContent = (productId, userId) => {
+  const process =  spawn('python', ['/Users/ananyaannadatha/Documents/GitHub/full-stack/recommendations/contentBased.py',productId]);
+  var parts = [];
+  
+  var res;
+   process.stdout.on('data', (data) => {
+  res = data.toString();
+});
+process.stderr.on('data', (data) => {
+  console.log('err results: %j', data.toString('utf8'))
+});
+process.stdout.on('end', async function(){
+  parts = res.split("\n");
+  parts.splice(5,5);
+  let existContent = await Recommend.findOne({user: userId});
+  if(existContent.length === 0){
+  const newContent = new Recommend({
+    user: userId,
+    contentProducts: parts
+  })
+  await newContent.save();
+} else {
+  existContent.contentProducts = parts;
+  await existContent.save();
+}
+});
+};
+
+export const triggerCollab = (productId, userId) => {
+  console.log("productId",productId);
+  console.log("userId",userId);
+
+  const process =  spawn('python', ['/Users/ananyaannadatha/Documents/GitHub/full-stack/recommendations/collabBased.py',productId,userId]);
+  var parts = [];
+  var res;
+   process.stdout.on('data', (data) => {
+  res = data.toString();
+});
+process.stderr.on('data', (data) => {
+  console.log('err results: %j', data.toString('utf8'))
+});
+process.stdout.on('end', async function(){
+  parts = res.split("\n");
+  parts.splice(0,2);
+  parts.splice(5,5);
+  console.log("parts",parts);
+  let existCollab = await Recommend.findOne({user: userId});
+  if(!existCollab){
+  const newCollab = new Recommend({
+    user: userId,
+    collabProducts: parts
+  })
+  await newCollab.save();
+} else {
+  existCollab.collabProducts = parts;
+  await existCollab.save();
+}
+});
 };

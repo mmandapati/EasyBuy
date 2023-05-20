@@ -6,7 +6,7 @@ import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { generateToken, isAdmin, isAuth, isSellerOrAdmin } from '../utils.js';
+import { generateToken, isAdmin, isAuth, isSellerOrAdmin, triggerContent, triggerCollab } from '../utils.js';
 
 const orderRouter = express.Router();
 
@@ -41,6 +41,8 @@ orderRouter.post(
       seller: req.body.orderItems[0].seller,
     });
     const order = await newOrder.save();
+    triggerContent(req.body.orderItems[0]._id, req.user._id);
+    triggerCollab(req.body.orderItems[0]._id, req.user._id);
     res.status(201).send({ message: 'New order created', order });
   })
 );

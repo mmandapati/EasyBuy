@@ -179,9 +179,9 @@ export default function DashboardScreen() {
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th>Count under 30</th>
-                      <th>Count under 60</th>
-                      <th>Count under 90</th>
+                      <th>Products {'<'} $30</th>
+                      <th>Products between $30-60</th>
+                      <th>Products {'>'} $60</th>
                     </tr>
                   </thead>
                   <tbody>
