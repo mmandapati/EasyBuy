@@ -330,10 +330,10 @@ productRouter.put(
               .messages()
               .send(
                 {
-                  from: 'EasyBuy <manasa.bobba999@gmail.com>',
+                  from: 'EasyBuy <easybuy.bio@gmail.com>',
                   to: `${x.name} <${x.email}>`,
                   subject: 'Wait is over, Back in stock',
-                  html: notifyEmailTemplate(product),
+                  html: notifyEmailTemplate(product, x.name),
                 },
                 (error, body) => {
                   if (error) {

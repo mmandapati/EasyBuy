@@ -171,6 +171,8 @@ function ProductScreen() {
       product.numReviews = data.numReviews;
       product.rating = data.rating;
       dispatch({ type: 'REFRESH_PRODUCT', payload: product });
+      setRating(0);
+      setComment('');
       window.scrollTo({
         behavior: 'smooth',
         top: reviewsRef.current.offsetTop,
@@ -304,7 +306,7 @@ function ProductScreen() {
         <ListGroup>
           {reviews.map((review) => (
             <ListGroup.Item key={review._id}>
-              <strong>{review.name}</strong>
+              <strong>{review.name || review.user.name}</strong>
               <Rating rating={review.rating} caption=" "></Rating>
               <p>{review.createdAt.substring(0, 10)}</p>
               <p>{review.comment}</p>

@@ -9,7 +9,10 @@ const reviewRouter = express.Router();
 reviewRouter.get(
   '/:id',
   expressAsyncHandler(async (req, res) => {
-    const reviews = await Review.find({ product: req.params.id });
+    const reviews = await Review.find({ product: req.params.id }).populate({
+      path: 'user',
+      select: 'name',
+    });
 
     res.send(reviews);
   })

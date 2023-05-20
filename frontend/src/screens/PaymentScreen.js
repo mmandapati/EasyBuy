@@ -17,10 +17,10 @@ export default function PaymentScreen() {
   } = state;
   const [cardName, setCardName] = useState(paymentInfo.cardName || '');
   const [cardNumber, setCardNumber] = useState(paymentInfo.cardNumber || '');
-  const [expirationDate, setExpirationDate] = useState('');
-  // const [expirationDate, setEpirationDate] = useState(
-  //   paymentInfo.expirationDate || ''
-  // );
+  //const [expirationDate, setExpirationDate] = useState('');
+  const [expirationDate, setExpirationDate] = useState(
+    paymentInfo.expirationDate || ''
+  );
   const [cvv, setCvv] = useState(paymentInfo.cvv || '');
 
   const isValidCreditCardNumber = (cardNumber) => {
@@ -112,6 +112,7 @@ export default function PaymentScreen() {
             <Form.Control
               type="text"
               value={cardNumber}
+              placeholder="xxxx-xxxx-xxxx-xxxx"
               onChange={handleCardNumberChange}
               required
             />
@@ -125,6 +126,7 @@ export default function PaymentScreen() {
                 <Form.Label>Expiration Date (MM/YY)</Form.Label>
                 <Form.Control
                   type="text"
+                  placeholder="MM/YY"
                   value={expirationDate}
                   onChange={handleExpirationDateChange}
                   required
@@ -139,6 +141,7 @@ export default function PaymentScreen() {
                 <Form.Label>Security Code</Form.Label>
                 <Form.Control
                   type="number"
+                  placeholder="xxx"
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value)}
                   required

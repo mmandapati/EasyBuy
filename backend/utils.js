@@ -64,6 +64,22 @@ export const mailgun = () =>
     domain: process.env.MAILGUN_DOMAIN,
   });
 
-export const notifyEmailTemplate = () => {
-  return '<h1> Hey you, Go check easybuy.com. Your favorite product is back in stock</h1>';
+export const notifyEmailTemplate = (product, name) => {
+  return `<h1> Item is back in stock<h1>
+  <p>Hey ${name},<br>
+  It is time to buy the item which you missed earlier. 
+  <br>Hurry up and place the order now.
+  Go check <a href="http://18.220.41.161:3000/product/${product._id}">here</a><br>
+  Your favorite product is back in stock<p>
+  <img
+          src=${product.image}
+          alt=${product.name}
+          style={{
+            width: '290px',
+            height: '400px',
+            padding: '5px',
+          }}
+        />
+        <p> Happy shopping<br>
+        Team Easybuy</p>`;
 };
