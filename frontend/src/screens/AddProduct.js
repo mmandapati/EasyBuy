@@ -51,6 +51,7 @@ export default function AddProduct() {
   const [brand, setBrand] = useState('');
   const [description, setDescription] = useState('');
   console.log('name', name);
+  console.log('price', price);
 
   const submitHandler = async (e) => {
     e.preventDefault();
